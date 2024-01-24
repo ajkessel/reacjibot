@@ -1,0 +1,9 @@
+maubot: 0.1.0
+id: org.rosi-kessel.reacjibot
+version: 0.1.1
+license: MIT
+modules:
+- reacjibot
+main_class: ReacjiBot
+extra_files:
+- base-config.yaml
