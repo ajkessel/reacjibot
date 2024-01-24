@@ -1,5 +1,3 @@
-TODO
-
 These are the emojis that are recognized by our Python emoji library.
 ```
 1st_place_medal
