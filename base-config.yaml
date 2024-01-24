@@ -4,6 +4,10 @@ allowed_users:
   - "@user2:server.tld"
 # domain to be added to alias/room ID if not otherwise specified
 domain: "server.tld"
+
+# should messages be reposted to a room if they've already been posted once (normally you don't want this)
+repost: false
+
 # specify emoji followed by channel name (either alias or Room ID)
 # format is "short emoji name":"channel name"
 # channel name can be

@@ -13,17 +13,18 @@ from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
 
-
 class Config(BaseProxyConfig):
     def do_update(self, helper: ConfigUpdateHelper) -> None:
         helper.copy("restrict_users")
         helper.copy("allowed_users")
         helper.copy("mapping")
         helper.copy("domain")
+        helper.copy("repost")
 
 class ReacjiBot(Plugin):
     async def start(self) -> None:
         self.reacji = {} 
+        self.crossposted = {}
         self.config.load_and_update()
         for key in self.config["mapping"]:
             room=self.config["mapping"][key]
@@ -48,7 +49,12 @@ class ReacjiBot(Plugin):
            if re.match(emoji.emojize(":"+key+":"),symbol):
               message = evt.sender + ": " + source_evt.content.body + ' [' + emoji.emojize(":"+key+":") + '](' + 'https://matrix.to/#/' + evt.room_id + '/' + evt.content.relates_to.event_id + '?via=' + self.config["domain"] +')'
               target_id = self.reacji[key]
+              if not self.config["repost"] and evt.content.relates_to.event_id in self.crossposted:
+                 if target_id in self.crossposted[evt.content.relates_to.event_id]:
+                    continue
               await self.client.send_markdown(target_id,message)
+              self.crossposted[evt.content.relates_to.event_id] = {}
+              self.crossposted[evt.content.relates_to.event_id][target_id] = "1"
               break
 
     @classmethod

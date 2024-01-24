@@ -1,4 +1,5 @@
 restrict_users: false
+dont_repost: true
 allowed_users:
   - "@user1:server.tld"
   - "@user2:server.tld"
@@ -10,4 +11,4 @@ domain: "server.tld"
 # - local alias (with or without leading #)
 # - real room ID (with leading !)
 mapping:
-  "train": "public_transportation"
+  - "train":"public_transportation"
