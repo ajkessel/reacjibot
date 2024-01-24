@@ -9,7 +9,7 @@ Will cause any message tagged with the train emoji :train: to be posted to the l
 
 See the [Emoji List](emoji_list.md) for the short emoji names used by this library.
 
-=== TODO items
+# TODO items
 
 * allow custom template for cross-posting
 * don't re-post a message that's already been posted once to a room
