@@ -1,5 +1,5 @@
 restrict_users: false
-dont_repost: true
+repost: false
 allowed_users:
   - "@user1:server.tld"
   - "@user2:server.tld"
