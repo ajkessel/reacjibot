@@ -40,6 +40,8 @@ class ReacjiBot(Plugin):
 
     @command.passive(regex=re.compile(r"[^A-Za-z0-9]"), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
     async def generic_react(self, evt: ReactionEvent, key: Tuple[str]) -> None:
+        if self.config['restrict_users'] and len(self.config['allowed_users']) > 0 and evt.sender not in self.config['allowed_users']:
+           return
         source_evt = await self.client.get_event(evt.room_id, evt.content.relates_to.event_id)
         symbol = evt.content.relates_to.key
         for key in self.reacji:

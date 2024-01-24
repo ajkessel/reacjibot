@@ -10,4 +10,4 @@ domain: "server.tld"
 # - local alias (with or without leading #)
 # - real room ID (with leading !)
 mapping:
-  - "train":"public_transportation"
+  "train": "public_transportation"
