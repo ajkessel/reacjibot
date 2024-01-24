@@ -5,6 +5,6 @@ You'll need to create a config.yaml (based on [example-config.yaml](example-conf
 mapping:
   - "train":"public_transportation"
 ```
-Will cause any message tagged with the train emoji :train: to be posted to teh local room with the alias #public_transportation.
+Will cause any message tagged with the train emoji :train: to be posted to the local room with the alias #public_transportation.
 
 See the [Emoji List](emoji_list.md) for the short emoji names used by this library.
