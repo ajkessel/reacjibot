@@ -17,4 +17,4 @@ debug: false
 # - local alias (with or without leading #)
 # - real room ID (with leading !)
 mapping:
-   🚋: public_transportation
+   🚋: 'public_transportation'
