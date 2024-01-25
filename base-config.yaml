@@ -9,9 +9,9 @@ domain: "server.tld"
 repost: false
 
 # specify emoji followed by channel name (either alias or Room ID)
-# format is "short emoji name":"channel name"
-# channel name can be
+# format is emoji: channel_name
+# channel-name can be
 # - local alias (with or without leading #)
 # - real room ID (with leading !)
 mapping:
-  "train": "public_transportation"
+   🚋: public_transportation
