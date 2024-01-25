@@ -59,7 +59,7 @@ class ReacjiBot(Plugin):
         symbol = evt.content.relates_to.key
         for key in self.reacji:
            if re.match(key,symbol):
-              message = evt.sender + ": " + source_evt.content.body + ' [' + key + '](' + 'https://matrix.to/#/' + evt.room_id + '/' + evt.content.relates_to.event_id + '?via=' + self.config["domain"] +')'
+              message = source_evt.sender + ": " + source_evt.content.body + ' [' + key + '](' + 'https://matrix.to/#/' + evt.room_id + '/' + evt.content.relates_to.event_id + '?via=' + self.config["domain"] +')'
               target_id = self.reacji[key]
               if not self.config["repost"] and evt.content.relates_to.event_id in self.crossposted:
                  if target_id in self.crossposted[evt.content.relates_to.event_id]:
