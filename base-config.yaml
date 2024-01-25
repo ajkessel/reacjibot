@@ -8,6 +8,9 @@ domain: "server.tld"
 # should messages be reposted to a room if they've already been posted once (normally you don't want this)
 repost: false
 
+# send debug messages to maubot log file
+debug: false
+
 # specify emoji followed by channel name (either alias or Room ID)
 # format is emoji: channel_name
 # channel-name can be
