@@ -11,6 +11,7 @@ Note the YAML parser is fussy and needs a space after the colon for the mapping 
 
 ## TODO items
 
+* add in-room commands to define mappings
 * allow custom template for cross-posting
 * cull back unnecessary libraries
 * allow multiple room posting with single emoji
