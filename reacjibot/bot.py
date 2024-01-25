@@ -1,8 +1,5 @@
-from typing import Awaitable, Type, Optional, Tuple
-import json
+from typing import Awaitable, Type, Tuple
 import re
-import time
-import random
 
 from mautrix.client import Client
 from mautrix.types import (Event, MessageType, EventID, UserID, FileInfo, EventType, RoomID,
