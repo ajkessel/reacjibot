@@ -18,10 +18,9 @@ class Config(BaseProxyConfig):
         helper.copy("repost")
 
 class ReacjiBot(Plugin):
-    async def start(self) -> None:
-        self.reacji = {} 
-        self.crossposted = {}
-        self.config.load_and_update()
+    reacji: dict
+    crossposted: dict
+    async def UpdateReacji(self) -> None:
         for key in self.config["mapping"]:
             room=self.config["mapping"][key]
             if room.find(":") == -1:
@@ -33,7 +32,18 @@ class ReacjiBot(Plugin):
                  room = (await self.client.resolve_room_alias('#' + room)).room_id
                except:
                  room = ""
+#            self.log.debug(f"mapping {key} to {room}")
             self.reacji[key] = room
+
+    async def start(self) -> None:
+        self.reacji = {}
+        self.crossposted = {}
+        self.config.load_and_update()
+        await self.UpdateReacji()
+
+    async def on_external_config_update(self) -> None:
+        self.config.load_and_update()
+        await self.UpdateReacji()
 
     @command.passive(regex=re.compile(r"[^A-Za-z0-9]"), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
     async def generic_react(self, evt: ReactionEvent, key: Tuple[str]) -> None:
