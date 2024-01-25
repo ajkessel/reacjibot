@@ -1,6 +1,6 @@
 This is a [Maubot](https://github.com/maubot/maubot) plugin for use in a [Matrix](https://matrix.org/) chat room. The plugin allows you to define arbitrary emoji reactions that will cause messages tagged with the specified emoji to be automatically cross-posted to a different room.
 
-**Important security warning**: the current implementation will post from any room to any other room, regardless of encryption. So, depending on how you configure it, you could have it post from an encrypted room to a non-encrypted room. I'll work on making this configurable in the future.
+**Important security warning**: the current implementation will post from any room defined in the configuration to any other room defined in the configuration, regardless of encryption of the source and destination rooms. So, depending on how you configure it, you could have it post from an encrypted room to a non-encrypted room (or vice-versa), so long as your maubot client is in both rooms. I'll work on making this configurable in the future.
 
 You'll need to create a config.yaml (based on [example-config.yaml](example-config.yaml)) to specify mappings. For example:
 ```
