@@ -1,15 +1,31 @@
+# only allow specified users to cross-post (default false)
 restrict_users: false
+
+# list of users allowed to cross-post (only effective if restrict_users is true)
+
 allowed_users:
   - "@user1:server.tld"
   - "@user2:server.tld"
-# domain to be added to alias/room ID if not otherwise specified
+
+# domain to be added to alias/room ID if not otherwise specified (normally your homeserver)
 domain: "server.tld"
 
-# should messages be reposted to a room if they've already been posted once (normally you don't want this)
+# template for cross-posting in the following format (default '[%on](%ol): %m \n\n (%b)')
+# %on = original poster's display name
+# %ol = link to original poster user ID
+# %m = body of posting
+# %b = link back to original posting
+# \n = linebreak
+template: "[%on](%ol): %m \n\n (%b)"
+
+# should messages be reposted to a room if they've already been posted once (default false)
 repost: false
 
-# send debug messages to maubot log file
+# send debug messages to maubot log file (default false)
 debug: false
+  
+# allow plugin to cross-post messages from encrypted channels to unencrypted channels (default true)
+insecure: true
 
 # specify emoji followed by channel name (either alias or Room ID)
 # format is emoji: channel_name
@@ -18,3 +34,4 @@ debug: false
 # - real room ID (with leading !)
 mapping:
    🚋: 'public_transportation'
+   💡: 'ideas'
