@@ -69,6 +69,9 @@ class ReacjiBot(Plugin):
         self.crossposted = {}
         self.encrypted = {}
         self.allowed = {}
+        self.debug = False
+        self.insecure = True
+        self.restrict = False
         self.template = '[%on](%ol): %m \n\n (%b)'
         try:
             self.debug = self.config["debug"]
