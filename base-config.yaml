@@ -14,11 +14,12 @@ domain: "server.tld"
 # %on = original poster's display name
 # %ol = link to original poster user ID
 # %m = body of posting
-# %bl = original emoji as hyperlink to original post 
+# %e = emoji causing cross-post
+# %bl = hyperlink to original post 
 # %bu = display name of the user who caused the original post
 # %bi = link to the cross-poster user ID
 # \n = linebreak
-template: "[%on](%ol): %m \n\n (%bl by [%bu](%bi))"
+template: "[%on](%ol): %m \n\n ([%e](%bl) by [%bu](%bi))"
 
 # should messages be reposted to a room if they've already been posted once (default false)
 repost: false
