@@ -77,7 +77,7 @@ class ReacjiBot(Plugin):
         self.insecure = True
         self.restrict = False
         self.repost = False
-        self.template = '[%on](%ol): %m \n\n (%b)'
+        self.template = '[%on](%ol): %m \n\n (%bl by [%bu](%bi))'
         try:
             self.debug = self.config["debug"]
             self.debug and self.log.debug(f"verbose debugging enabled in config.yaml")
@@ -135,15 +135,15 @@ class ReacjiBot(Plugin):
                 xmessage = MatrixURI.build(evt.room_id, EventID(evt.content.relates_to.event_id))
                 # xlink: link to the original message as displayed, with an emoji icon as the link
                 xlink = f"[{key}]({xmessage})"
-                # xlinkback: the full hyperlinked string to the original message
-                xlinkback = f"{xlink} by {xuserlink}"
                 # message: the full message to be posted in the new room
                 message = self.template
                 message = message.replace('%on',displayname)
                 message = message.replace('%ol',str(userlink))
                 message = message.replace('%m',body)
                 message = message.replace('\\n',chr(10))
-                message = message.replace('%b',str(xlinkback))
+                message = message.replace('%bl',xlink)
+                message = message.replace('%bu',xdisplayname)
+                message = message.replace('%bi',str(xuserlink))
                 self.debug and self.log.debug(f"posting {message} to {target_id}")
                 await self.client.send_markdown(target_id,message)
                 # add post to the crossposted dictionary to avoid future reposts

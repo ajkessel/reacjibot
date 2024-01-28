@@ -10,7 +10,7 @@ mapping:
 ```
 Will cause any message tagged with the bulb emoji :bulb: to be posted to the local room with the alias #ideas and the train emoji :train: to be posted to the local room with the alias #public_transportation. You can define as many actions as you want, although currently the plugin is limited to posting to one room per emoji reaction.
 
-In the cross-posted channel, the message will have the emoji appended to the end which serves as a hyperlink back to the original message.
+In the cross-posted channel, the message will have the emoji that caused the cross-post appended to the end which serves as a hyperlink back to the original message, as well as the name of the user who caused the cross-post.
 
 Note the YAML parser is fussy and needs a space after the colon for the mapping to work correctly. You will also need to put the room name in quotes if you use the fully qualified room name (!room_id:server.tld) as opposed to the alias.
 

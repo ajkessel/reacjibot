@@ -14,7 +14,7 @@ domain: "server.tld"
 # %on = original poster's display name
 # %ol = link to original poster user ID
 # %m = body of posting
-# %b = link back to original posting
+# %b = backlink: original emoji as hyperlink to original post followed by an identifier of the user causing the cross-post
 # \n = linebreak
 template: "[%on](%ol): %m \n\n (%b)"
 
