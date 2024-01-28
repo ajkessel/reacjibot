@@ -7,10 +7,10 @@ Example use cases could be tagging messages with :bulb: to post them to an #idea
 You'll need to create a config.yaml (based on [example-config.yaml](example-config.yaml)) to specify mappings. For example:
 ```
 mapping:
-   �~_~R�: 'id
-  🚋: 'public_transportation'
+  :bulb: 'ideas'
+  :train: 'public_transportation'
 ```
-Will cause any message tagged with the train emoji 🚋 to be posted to the local room with the alias #public_transportation. You can define as many actions as you want, although currently the plugin is limited to posting to one room per emoji reaction.
+Will cause any message tagged with the bulb emoji :bulb: to be posted to the local room with the alias #ideas and the train emoji :train: to be posted to the local room with the alias #public_transportation. You can define as many actions as you want, although currently the plugin is limited to posting to one room per emoji reaction.
 
 In the cross-posted channel, the message will have the emoji appended to the end which serves as a hyperlink back to the original message.
 
