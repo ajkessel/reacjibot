@@ -4,7 +4,7 @@ import re
 from mautrix.client import Client
 from mautrix.types import (Event, MessageType, EventID, UserID, FileInfo, EventType, RoomID,
                             MediaMessageEventContent, TextMessageEventContent, ContentURI,
-                            ReactionEvent, RedactionEvent, ImageInfo, RelationType)
+                            MatrixURI, ReactionEvent, RedactionEvent, ImageInfo, RelationType)
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
@@ -59,14 +59,34 @@ class ReacjiBot(Plugin):
         symbol = evt.content.relates_to.key
         for key in self.reacji:
            if re.match(key,symbol):
-              message = source_evt.sender + ": " + source_evt.content.body + ' [' + key + '](' + 'https://matrix.to/#/' + evt.room_id + '/' + evt.content.relates_to.event_id + '?via=' + self.config["domain"] +')'
+               # assemble cross-post string if matching reacji is found
               target_id = self.reacji[key]
+               # first check to make sure this is not a re-post; if it has already been posted and repost is not true, skip
               if not self.config["repost"] and evt.content.relates_to.event_id in self.crossposted:
                  if target_id in self.crossposted[evt.content.relates_to.event_id]:
                     self.debug and self.log.debug(f"event {source_evt.content.body} already cross-posted, skipping")
                     continue
+               # displayname: the display name for the original poster
+              displayname = await self.client.get_displayname(source_evt.sender)
+               # userlink: a hyperlink to the original poster's user ID
+              userlink = MatrixURI.build(source_evt.sender)
+               # body: the contents of the message to be cross-posted
+              body = source_evt.content.body
+               # xdisplayname: the display name of the person cross-posting
+              xdisplayname = await self.client.get_displayname(evt.sender)
+               # xuserlink: a hyperlink to the cross-poster's user ID
+              xuserlink = MatrixURI.build(evt.sender)
+               # xmessage: a hyperlink to the original message
+              xmessage = MatrixURI.build(evt.room_id, EventID(evt.content.relates_to.event_id))
+               # xlink: link to the original message as displayed, with an emoji icon as the link
+              xlink = f"[{key}]({xmessage})"
+               # xlinkback: the full hyperlinked string to the original message
+              xlinkback = f"{xlink} by {xuserlink}"
+               # message: the full message to be posted in the new room
+              message = f"[{displayname}]({userlink}): {body} {chr(10)}{chr(10)} ({xlinkback})"
               self.debug and self.log.debug(f"posting {message} to {target_id}")
               await self.client.send_markdown(target_id,message)
+               # add post to the crossposted dictionary to avoid future reposts
               self.crossposted[evt.content.relates_to.event_id] = {}
               self.crossposted[evt.content.relates_to.event_id][target_id] = "1"
               break

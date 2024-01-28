@@ -7,7 +7,7 @@ You'll need to create a config.yaml (based on [example-config.yaml](example-conf
 mapping:
   🚋: 'public_transportation'
 ```
-Will cause any message tagged with the train emoji 🚋 to be posted to the local room with the alias #public_transportation. You can define as many actions as you want, although currently the system is limited to posting to one room per emoji reaction.
+Will cause any message tagged with the train emoji 🚋 to be posted to the local room with the alias #public_transportation. You can define as many actions as you want, although currently the plugin is limited to posting to one room per emoji reaction.
 
 In the cross-posted channel, the message will have the emoji appended to the end which serves as a hyperlink back to the original message.
 
