@@ -18,6 +18,7 @@ domain: "server.tld"
 # %bl = hyperlink to original post 
 # %bu = display name of the user who caused the original post
 # %bi = link to the cross-poster user ID
+# %rn = room name of originating message
 # \n = linebreak
 template: "[%on](%ol): %m \n\n ([%e](%bl) by [%bu](%bi))"
 
