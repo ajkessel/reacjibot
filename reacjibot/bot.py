@@ -125,28 +125,28 @@ class ReacjiBot(Plugin):
                 displayname = await self.client.get_displayname(source_evt.sender)
                 # name of the room original message was posted in
                 roomnamestate = await self.client.get_state_event(source_evt.room_id, 'm.room.name')
-                roomname = roomnamestate['name']
+                roomname = str(roomnamestate['name'])
                 # userlink: a hyperlink to the original poster's user ID
-                userlink = MatrixURI.build(source_evt.sender)
+                userlink = str(MatrixURI.build(source_evt.sender))
                 # body: the contents of the message to be cross-posted
                 body = source_evt.content.body
                 # xdisplayname: the display name of the person cross-posting
                 xdisplayname = await self.client.get_displayname(evt.sender)
                 # xuserlink: a hyperlink to the cross-poster's user ID
-                xuserlink = MatrixURI.build(evt.sender)
+                xuserlink = str(MatrixURI.build(evt.sender))
                 # xmessage: a hyperlink to the original message
-                xmessage = MatrixURI.build(evt.room_id, EventID(evt.content.relates_to.event_id))
+                xmessage = str(MatrixURI.build(evt.room_id, EventID(evt.content.relates_to.event_id)))
                 # message: the full message to be posted in the new room
                 message = self.template
-                message = message.replace('%on',displayname)
-                message = message.replace('%ol',str(userlink))
-                message = message.replace('%m',body)
                 message = message.replace('\\n',chr(10))
+                message = message.replace('%on',displayname)
+                message = message.replace('%ol',userlink)
+                message = message.replace('%m',body)
                 message = message.replace('%e',key)
-                message = message.replace('%bl',str(xmessage))
+                message = message.replace('%bl',xmessage)
                 message = message.replace('%bu',xdisplayname)
-                message = message.replace('%bi',str(xuserlink))
-                message = message.replace('%rn',str(roomname))
+                message = message.replace('%bi',xuserlink)
+                message = message.replace('%rn',roomname)
                 self.debug and self.log.debug(f"posting {message} to {target_id}")
                 await self.client.send_markdown(target_id,message)
                 # add post to the crossposted dictionary to avoid future reposts
