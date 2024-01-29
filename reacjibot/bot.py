@@ -123,6 +123,9 @@ class ReacjiBot(Plugin):
                         continue
                 # displayname: the display name for the original poster
                 displayname = await self.client.get_displayname(source_evt.sender)
+                # name of the room original message was posted in
+                roomnamestate = await self.client.get_state_event(source_evt.room_id, 'm.room.name')
+                roomname = roomnamestate['name']
                 # userlink: a hyperlink to the original poster's user ID
                 userlink = MatrixURI.build(source_evt.sender)
                 # body: the contents of the message to be cross-posted
@@ -143,6 +146,7 @@ class ReacjiBot(Plugin):
                 message = message.replace('%bl',str(xmessage))
                 message = message.replace('%bu',xdisplayname)
                 message = message.replace('%bi',str(xuserlink))
+                message = message.replace('%rn',str(roomname))
                 self.debug and self.log.debug(f"posting {message} to {target_id}")
                 await self.client.send_markdown(target_id,message)
                 # add post to the crossposted dictionary to avoid future reposts
