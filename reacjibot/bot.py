@@ -23,6 +23,7 @@ class Config(BaseProxyConfig):
         helper.copy("repost")
         helper.copy("insecure")
         helper.copy("template")
+        helper.copy("images")
 
 class ReacjiBot(Plugin):
     reacji: dict        # reacji->room mappings
@@ -33,6 +34,7 @@ class ReacjiBot(Plugin):
     restrict: bool      # are only identified users allow to cross-post
     debug: bool         # preference for debug logging
     repost: bool        # preference for reposting tagged messages
+    images: bool        # preference for crossposting images
     template: str       # template for cross-posting messages
 
 # UpdateReacji: re-process emoji->room mappings and look up rooms as required
@@ -77,6 +79,7 @@ class ReacjiBot(Plugin):
         self.insecure = True
         self.restrict = False
         self.repost = False
+        self.images = True
         self.template = '[%on](%ol): %m \n\n ([%e](%bl) by [%bu](%bi))'
         try:
             self.debug = self.config["debug"]
@@ -88,6 +91,7 @@ class ReacjiBot(Plugin):
                 self.debug and self.log.debug(f"using default template")
             self.insecure = self.config["insecure"]
             self.restrict = self.config["restrict_users"]
+            self.images = self.config["images"]
             if self.restrict:
                 self.allowed = self.config["allowed_users"]
         except:
@@ -147,11 +151,20 @@ class ReacjiBot(Plugin):
                 message = message.replace('%bu',xdisplayname)
                 message = message.replace('%bi',xuserlink)
                 message = message.replace('%rn',roomname)
-                self.debug and self.log.debug(f"posting {message} to {target_id}")
-                await self.client.send_markdown(target_id,message)
-                # add post to the crossposted dictionary to avoid future reposts
-                self.crossposted[evt.content.relates_to.event_id] = {}
-                self.crossposted[evt.content.relates_to.event_id][target_id] = True
+                try:
+                    self.debug and self.log.debug(f"posting {message} to {target_id}")
+                    if source_evt.content.msgtype == MessageType.IMAGE:
+                        if self.images:
+                            # TODO - implement better (customizable) interface when the cross-posted content is an image
+                           await self.client.send_markdown(target_id,message)
+                           await self.client.send_message(target_id,source_evt.content)
+                    else:
+                        await self.client.send_markdown(target_id,message)
+                    # add post to the crossposted dictionary to avoid future reposts
+                    self.crossposted[evt.content.relates_to.event_id] = {}
+                    self.crossposted[evt.content.relates_to.event_id][target_id] = True
+                except:
+                    self.debug and self.log.debug(f"message posting failed due to {error}")
                 break
 
     @classmethod

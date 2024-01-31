@@ -31,6 +31,9 @@ debug: false
 # allow plugin to cross-post messages from encrypted channels to unencrypted channels (default true)
 insecure: true
 
+# allow images to be cross-posted (default true)
+images: true
+
 # specify emoji followed by channel name (either alias or Room ID)
 # format is emoji: channel_name
 # channel-name can be
