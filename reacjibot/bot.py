@@ -36,23 +36,29 @@ class ReacjiBot(Plugin):
     repost: bool        # preference for reposting tagged messages
     images: bool        # preference for crossposting images
     template: str       # template for cross-posting messages
+    base_command: str   # command for talking to the bot
+    base_aliases: Tuple[str, ...]   # aliases for bot base command
 
 # UpdateReacji: re-process emoji->room mappings and look up rooms as required
     async def UpdateReacji(self) -> None:
         for key in self.config["mapping"]:
-            room=self.config["mapping"][key]
-            if room.find(":") == -1:
-                room = room + ":" + self.config["domain"]
-            if room[0] == "#":
-                room = room[1:]
-            if room[0] != "!":
-                try:
-                    room = (await self.client.resolve_room_alias('#' + room)).room_id
-                except:
-                    self.debug and self.log.debug(f"no valid room mapping found for {room}")
-                    room = ""
-            self.debug and self.log.debug(f"mapping {key} to {room}")
+            room = await self.MapRoom(self.config["mapping"][key])
             self.reacji[key] = room
+            self.debug and self.log.debug(f"mapping {key} to {room}")
+
+# MapRoom: find room ID based on alias or fully qualified room name
+    async def MapRoom(self, room_candidate: str) -> str:
+        if room_candidate.find(":") == -1:
+            room_candidate = room_candidate + ":" + self.config["domain"]
+        if room_candidate[0] == "#":
+            room_candidate = room_candidate[1:]
+        if room_candidate[0] != "!":
+            try:
+                room_candidate = (await self.client.resolve_room_alias('#' + room_candidate)).room_id
+            except:
+                self.debug and self.log.debug(f"no valid room mapping found for {room_candidate}")
+                room_candidate = ""
+        return room_candidate
 
 # IsEncrypted: check if room_id is an encrypted room, used if insecure is set to false
     async def IsEncrypted(self, room_id) -> None:
@@ -80,10 +86,14 @@ class ReacjiBot(Plugin):
         self.restrict = False
         self.repost = False
         self.images = True
+        self.base_command = 'reacji'
         self.template = '[%on](%ol): %m \n\n ([%e](%bl) by [%bu](%bi))'
         try:
             self.debug = self.config["debug"]
             self.debug and self.log.debug(f"verbose debugging enabled in config.yaml")
+            bc = self.config["base_command"]
+            self.base_command = bc[0] if isinstance(bc, list) else bc
+            self.base_aliases = tuple(bc) if isinstance(bc, list) else (bc,)
             if self.config['template']:
                 self.template = self.config["template"]
                 self.debug and self.log.debug(f"got template {self.template}")
@@ -102,8 +112,7 @@ class ReacjiBot(Plugin):
         await self.start()
 
 # generic_react: called when a reaction to a message event occurs; main guts of the plugin
-# TODO - find a better regexp that only matches emojis
-    @command.passive(regex=re.compile(r"[^A-Za-z0-9]"), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
+    @command.passive(regex=re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
     async def generic_react(self, evt: ReactionEvent, key: Tuple[str]) -> None:
         if self.restrict and evt.sender not in self.allowed:
             self.debug and self.log.debug(f"user {evt.sender} not allowed to cross-post")
@@ -129,7 +138,7 @@ class ReacjiBot(Plugin):
                 displayname = await self.client.get_displayname(source_evt.sender)
                 # name of the room original message was posted in
                 roomnamestate = await self.client.get_state_event(source_evt.room_id, 'm.room.name')
-                roomname = str(roomnamestate['name'])
+                rn = str(roomnamestate['name'])
                 # userlink: a hyperlink to the original poster's user ID
                 userlink = str(MatrixURI.build(source_evt.sender))
                 # body: the contents of the message to be cross-posted
@@ -150,7 +159,7 @@ class ReacjiBot(Plugin):
                 message = message.replace('%bl',xmessage)
                 message = message.replace('%bu',xdisplayname)
                 message = message.replace('%bi',xuserlink)
-                message = message.replace('%rn',roomname)
+                message = message.replace('%rn',rn)
                 try:
                     self.debug and self.log.debug(f"posting {message} to {target_id}")
                     if source_evt.content.msgtype == MessageType.IMAGE:
@@ -170,3 +179,85 @@ class ReacjiBot(Plugin):
     @classmethod
     def get_config_class(cls) -> Type[BaseProxyConfig]:
         return Config
+
+    @command.new(name=lambda self: self.base_command,
+                 aliases=lambda self, alias: alias in self.base_aliases,
+                 help="Interact with reacjibot", require_subcommand=False)
+    async def reacji(self, evt: MessageEvent) -> None:
+        await evt.reply(f"reacjibot at your service\n\n!{self.base_command} help for help\n")
+
+    @reacji.subcommand("help", help="Usage instructions")
+    async def help(self, evt: MessageEvent) -> None:
+        await evt.reply(f"Maubot [Reacjibot](https://github.com/ajkessel/reacjibot) plugin.\n\n"
+                        f"* !{self.base_command} map emoji room_name - map emoji to room\n"
+                        f"* !{self.base_command} delete emoji - remove emoji mapping\n"
+                        f"* !{self.base_command} list [optional emoji name] - list reacji mappings\n"
+                        f"* !{self.base_command} help - this message\n")
+
+    @reacji.subcommand("list", help="List reacji mappings")
+    @command.argument("emojus", pass_raw=False, required=False)
+    async def list(self, evt: MessageEvent, emojus: str) -> None:
+        mappings=""
+        if emojus:
+            try:
+                xroom = str(MatrixURI.build(self.reacji[emojus]))
+                mappings = mappings + f"* {emojus} to {xroom}\n"
+            except:
+                mappings = f"* {emojus} is not mapped\n"
+        else:
+            for key in self.reacji:
+                xroom = str(MatrixURI.build(self.reacji[key]))
+                mappings = mappings + f"* {key} to {xroom}\n"
+        await evt.reply(mappings)
+        return
+
+    @reacji.subcommand("map", help="Define a emoji-room mapping")
+    @command.argument("mapping", pass_raw=True, required=True)
+    async def map(self, evt: MessageEvent, mapping: str) -> None:
+        if self.restrict and evt.sender not in self.allowed:
+            await evt.reply(f"Sorry, you are not allowed to configure reacjibot. Please ask your site administrator for permission.\n")
+            self.debug and self.log.debug(f"user {evt.sender} not allowed to configure")
+            return
+        try:
+            x = mapping.split(" ")
+            re_emoji = re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE)
+            re_html = re.compile(r'<.*?>')
+            emoji = re_emoji.findall(x[0])
+            room_candidate = re_html.sub('',x[1])
+            room = await self.MapRoom(room_candidate)
+            xroom = str(MatrixURI.build(room))
+        finally: 
+            if not emoji or not room:
+               await evt.reply(f"error, invalid mapping {mapping}")
+               return
+            for emojus in emoji:
+               await evt.reply(f"mapping {emojus} to {xroom}")
+               self.reacji[emojus] = room
+               self.config["mapping"][emojus] = room
+            self.config.save()
+        return
+
+    @reacji.subcommand("delete", help="Delete a emoji-room mapping", aliases=("del","erase","unmap"))
+    @command.argument("mapping", pass_raw=True, required=True)
+    async def delete(self, evt: MessageEvent, mapping: str) -> None:
+        if self.restrict and evt.sender not in self.allowed:
+            await evt.reply(f"Sorry, you are not allowed to configure reacjibot. Please ask your site administrator for permission.\n")
+            self.debug and self.log.debug(f"user {evt.sender} not allowed to configure")
+            return
+        try:
+            x = mapping.split(" ")
+            re_emoji = re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE)
+            emoji = re_emoji.findall(x[0])
+        finally: 
+            if not emoji:
+               await evt.reply(f"error, invalid delete command {mapping}")
+               return
+            for emojus in emoji:
+               try:
+                  del self.reacji[emojus]
+                  del self.config["mapping"][emojus]
+                  await evt.reply(f"deleting mapping for {emojus}")
+               except:
+                  await evt.reply(f"{emojus} is not mapped")
+            self.config.save()
+        return

@@ -34,6 +34,12 @@ insecure: true
 # allow images to be cross-posted (default true)
 images: true
 
+# Base command without the prefix (!).
+# If a list is provided, the first is the main name and the rest are aliases.
+base_command:
+ - reacji
+ - reacjibot
+
 # specify emoji followed by channel name (either alias or Room ID)
 # format is emoji: channel_name
 # channel-name can be

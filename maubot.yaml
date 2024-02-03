@@ -1,6 +1,6 @@
 maubot: 0.1.0
 id: org.rosi-kessel.reacjibot
-version: 2.0.5
+version: 2.7.6
 license: MIT
 modules:
   - reacjibot

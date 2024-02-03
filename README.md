@@ -1,8 +1,9 @@
-This is a [Maubot](https://github.com/maubot/maubot) plugin for use in a [Matrix](https://matrix.org/) chat room. The plugin allows you to define arbitrary emoji reactions that will cause messages tagged with the specified emoji to be automatically cross-posted to a different room.
+## Reacjibot
+This is a [Maubot](https://github.com/maubot/maubot) plugin for use in a [Matrix](https://matrix.org/) chat room. The plugin allows you to define arbitrary emoji reactions that will cause messages tagged with the specified emoji to be automatically cross-posted to a different room. Once you have installed an initial configuration, you can define, undefine, and list mappings in the room with the `!reacji` command (or whatever you define as base_command in the configuration).
 
 Example use cases could be tagging messages with :bulb: to post them to an #ideas channel for follow-up. Or if a message is off-topic, an emoji-reaction (say :train:) could cause the message to be reposted to the room with the correct topic for further discussion (say #public_transportation).
 
-You'll need to create a config.yaml (based on [example-config.yaml](example-config.yaml)) to specify mappings. For example:
+You'll need to create an initial config.yaml (based on [example-config.yaml](example-config.yaml)) to specify mappings. For example:
 ```
 mapping:
   💡: 'ideas'
@@ -19,6 +20,5 @@ If `insecure` is set to `true` (the default setting), the plugin will post from 
 
 ## TODO 
 
-* add in-room commands to define mappings
 * cull back unnecessary libraries
 * allow multiple room posting with single emoji
