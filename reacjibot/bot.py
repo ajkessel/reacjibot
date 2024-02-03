@@ -24,6 +24,7 @@ class Config(BaseProxyConfig):
         helper.copy("insecure")
         helper.copy("template")
         helper.copy("images")
+        helper.copy("base_command")
 
 class ReacjiBot(Plugin):
     reacji: dict        # reacji->room mappings
