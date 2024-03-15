@@ -113,7 +113,7 @@ class ReacjiBot(Plugin):
         await self.start()
 
 # generic_react: called when a reaction to a message event occurs; main guts of the plugin
-    @command.passive(regex=re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
+    @command.passive(regex=re.compile('(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+', flags=re.UNICODE), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
     async def generic_react(self, evt: ReactionEvent, key: Tuple[str]) -> None:
         if self.restrict and evt.sender not in self.allowed:
             self.debug and self.log.debug(f"user {evt.sender} not allowed to cross-post")
