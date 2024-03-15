@@ -16,6 +16,8 @@ In the cross-posted channel, the message will have the emoji that caused the cro
 
 Note the YAML parser is fussy and needs a space after the colon for the mapping to work correctly. You will also need to put the room name in quotes if you use the fully qualified room name (!room_id:server.tld) as opposed to the local alias.
 
+Although perhaps obvious, your Maubot user running this plugin will need to be a member of both the source and target rooms to perform its function.
+
 ## Important security warning
 If `insecure` is set to `true` (the default setting), the plugin will post from any room defined in the configuration to any other room defined in the configuration, regardless of encryption of the source and destination rooms. So, depending on how you configure it, you could have it post from an encrypted room to a non-encrypted room (or vice-versa), so long as your maubot client is in both rooms. If you want to prohibit this behavior, set `insecure` in config.yaml to `false`.
 
