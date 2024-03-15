@@ -13,6 +13,8 @@ from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command, event
 
+EMOJI=re.compile('(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+', flags=re.UNICODE)
+
 class Config(BaseProxyConfig):
     def do_update(self, helper: ConfigUpdateHelper) -> None:
         helper.copy("debug")
@@ -113,7 +115,7 @@ class ReacjiBot(Plugin):
         await self.start()
 
 # generic_react: called when a reaction to a message event occurs; main guts of the plugin
-    @command.passive(regex=re.compile('(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+', flags=re.UNICODE), field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
+    @command.passive(regex=EMOJI, field=lambda evt: evt.content.relates_to.key, event_type=EventType.REACTION, msgtypes=None)
     async def generic_react(self, evt: ReactionEvent, key: Tuple[str]) -> None:
         if self.restrict and evt.sender not in self.allowed:
             self.debug and self.log.debug(f"user {evt.sender} not allowed to cross-post")
@@ -221,9 +223,8 @@ class ReacjiBot(Plugin):
             return
         try:
             x = mapping.split(" ")
-            re_emoji = re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE)
             re_html = re.compile(r'<.*?>')
-            emoji = re_emoji.findall(x[0])
+            emoji = EMOJI.findall(x[0])
             room_candidate = re_html.sub('',x[1])
             room = await self.MapRoom(room_candidate)
             xroom = str(MatrixURI.build(room))
@@ -247,8 +248,7 @@ class ReacjiBot(Plugin):
             return
         try:
             x = mapping.split(" ")
-            re_emoji = re.compile('[\U00010000-\U0010ffff]+', flags=re.UNICODE)
-            emoji = re_emoji.findall(x[0])
+            emoji = EMOJI.findall(x[0])
         finally: 
             if not emoji:
                await evt.reply(f"error, invalid delete command {mapping}")
